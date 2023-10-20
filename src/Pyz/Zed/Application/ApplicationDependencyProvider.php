@@ -7,6 +7,7 @@
 
 namespace Pyz\Zed\Application;
 
+use Pyz\Zed\Application\Communication\Plugin\OpenTelemetrySetupPlugin;
 use Spryker\Zed\Application\ApplicationDependencyProvider as SprykerApplicationDependencyProvider;
 use Spryker\Zed\Currency\Communication\Plugin\Application\CurrencyBackendGatewayApplicationPlugin;
 use Spryker\Zed\ErrorHandler\Communication\Plugin\Application\ErrorHandlerApplicationPlugin;
@@ -15,6 +16,7 @@ use Spryker\Zed\EventDispatcher\Communication\Plugin\Application\BackendGatewayE
 use Spryker\Zed\EventDispatcher\Communication\Plugin\Application\EventDispatcherApplicationPlugin;
 use Spryker\Zed\Form\Communication\Plugin\Application\FormApplicationPlugin;
 use Spryker\Zed\Http\Communication\Plugin\Application\HttpApplicationPlugin;
+use Spryker\Zed\Kernel\Container;
 use Spryker\Zed\Locale\Communication\Plugin\Application\LocaleApplicationPlugin;
 use Spryker\Zed\Locale\Communication\Plugin\Application\LocaleBackendGatewayApplicationPlugin;
 use Spryker\Zed\Messenger\Communication\Plugin\Application\MessengerApplicationPlugin;
@@ -36,6 +38,9 @@ use Spryker\Zed\ZedRequest\Communication\Plugin\Application\RequestBackendGatewa
 
 class ApplicationDependencyProvider extends SprykerApplicationDependencyProvider
 {
+
+    public const SERVICE_OPENTELEMETRY = 'SERVICE_OPENTELEMETRY';
+
     /**
      * @deprecated Use {@link \Pyz\Zed\Application\ApplicationDependencyProvider::getBackofficeApplicationPlugins()} instead.
      *
@@ -67,6 +72,7 @@ class ApplicationDependencyProvider extends SprykerApplicationDependencyProvider
             new SecurityApplicationPlugin(),
             new NumberFormatterApplicationPlugin(),
             new BackofficeStoreApplicationPlugin(),
+            new OpenTelemetrySetupPlugin(),
         ];
 
         if (class_exists(WebProfilerApplicationPlugin::class)) {
@@ -93,6 +99,7 @@ class ApplicationDependencyProvider extends SprykerApplicationDependencyProvider
             new PropelApplicationPlugin(),
             new BackendGatewayRouterApplicationPlugin(),
             new HttpApplicationPlugin(),
+            new OpenTelemetrySetupPlugin(),
         ];
     }
 
@@ -110,6 +117,17 @@ class ApplicationDependencyProvider extends SprykerApplicationDependencyProvider
             new HttpApplicationPlugin(),
             new ErrorHandlerApplicationPlugin(),
             new ValidatorApplicationPlugin(),
+            new OpenTelemetrySetupPlugin(),
         ];
+    }
+
+    public function provideCommunicationLayerDependencies(Container $container)
+    {
+
+        $container = parent::provideCommunicationLayerDependencies($container);
+
+        $container->set(static::SERVICE_OPENTELEMETRY, fn() => $container->getLocator()->openTelemetry()->service());
+
+        return $container;
     }
 }

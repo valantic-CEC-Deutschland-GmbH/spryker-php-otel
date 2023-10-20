@@ -11,10 +11,13 @@ use Pyz\Yves\CompanyPage\Plugin\ShopApplication\CompanyUserRestrictionHandlerPlu
 use Pyz\Yves\CompanyWidget\Widget\MenuItemCompanyWidget;
 use Pyz\Yves\CustomerFullNameWidget\Widget\CustomerFullNameWidget;
 use Pyz\Yves\ProductSetWidget\Widget\ProductSetIdsWidget;
+use Pyz\Yves\ShopApplication\Plugin\OpenTelemetrySetupPlugin;
+use Spryker\Service\Container\Exception\FrozenServiceException;
 use Spryker\Yves\ErrorHandler\Plugin\Application\ErrorHandlerApplicationPlugin;
 use Spryker\Yves\EventDispatcher\Plugin\Application\EventDispatcherApplicationPlugin;
 use Spryker\Yves\Form\Plugin\Application\FormApplicationPlugin;
 use Spryker\Yves\Http\Plugin\Application\HttpApplicationPlugin;
+use Spryker\Yves\Kernel\Container;
 use Spryker\Yves\Locale\Plugin\Application\LocaleApplicationPlugin;
 use Spryker\Yves\Messenger\Plugin\Application\FlashMessengerApplicationPlugin;
 use Spryker\Yves\Router\Plugin\Application\RouterApplicationPlugin;
@@ -161,6 +164,8 @@ use SprykerShop\Yves\WebProfilerWidget\Plugin\Application\WebProfilerApplication
  */
 class ShopApplicationDependencyProvider extends SprykerShopApplicationDependencyProvider
 {
+    public const SERVICE_OPENTELEMETRY = 'SERVICE_OPENTELEMETRY';
+
     /**
      * @return array<string>
      */
@@ -340,6 +345,7 @@ class ShopApplicationDependencyProvider extends SprykerShopApplicationDependency
             new ValidatorApplicationPlugin(),
             new SecurityApplicationPlugin(),
             new CustomerConfirmationUserCheckerApplicationPlugin(),
+            new OpenTelemetrySetupPlugin(),
         ];
 
         if (class_exists(WebProfilerApplicationPlugin::class)) {
@@ -347,5 +353,13 @@ class ShopApplicationDependencyProvider extends SprykerShopApplicationDependency
         }
 
         return $applicationPlugins;
+    }
+
+    public function provideDependencies(Container $container) {
+        $container = parent::provideDependencies($container);
+
+        $container->set(static::SERVICE_OPENTELEMETRY, fn() => $container->getLocator()->openTelemetry()->service());
+
+        return $container;
     }
 }

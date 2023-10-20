@@ -20,10 +20,28 @@ class IndexController extends SprykerIndexController
 
     public function indexAction()
     {
-        $this->demoOTLP();
+       // $this->startOTLP();
+
+        //$this->demoOTLP();
 
         return parent::indexAction();
     }
+
+    public function startOTLP() {
+        $tracerProvider =  new TracerProvider(
+            new SimpleSpanProcessor(
+                (new SpanExporterFactory())->create()
+            )
+        );
+
+        $tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
+
+        //start a root span
+        $rootSpan = $tracer->spanBuilder('YVES::Index')->startSpan();
+
+        $rootScope = $rootSpan->activate();
+    }
+
     private function demoOTLP(): void
     {
         $tracerProvider =  new TracerProvider(
