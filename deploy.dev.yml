@@ -5,7 +5,7 @@ tag: 'dev'
 
 environment: docker.dev
 image:
-    tag: bate/spryker-php-otel:8.1
+    tag: haukebst20220425/otel-php-docker:v1-release
     php:
         enabled-extensions:
     environment:
@@ -35,9 +35,15 @@ image:
 #        OTEL_BLRP_MAX_EXPORT_BATCH_SIZE: 1
 #        OTEL_BLRP_SCHEDULE_DELAY: 1
 
+        OTEL_PHP_AUTOLOAD_ENABLED: true
+        OTEL_TRACES_EXPORTER: otlp
+        OTEL_LOGS_EXPORTER: otlp
+        OTEL_METRICS_EXPORTER: otlp
+        OTEL_EXPORTER_OTLP_PROTOCOL: http/json
+        OTEL_PROPAGATORS: baggage,tracecontext
         OTEL_EXPORTER_OTLP_ENDPOINT: https://api.honeycomb.io
-        OTEL_SERVICE_NAME: spryker-unknown
-        OTEL_EXPORTER_OTLP_HEADERS: "x-honeycomb-team=le1jtssvHOMexDB8rkQ1IB"
+        OTEL_SERVICE_NAME: spryker-opentelemetry-demo
+        OTEL_EXPORTER_OTLP_HEADERS: "x-honeycomb-team=R6eFvJ6nPc2KYdmp6Md4oH"
         OTEL_BLRP_MAX_EXPORT_BATCH_SIZE: 1
         OTEL_BLRP_SCHEDULE_DELAY: 1
     node:
