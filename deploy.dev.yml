@@ -46,6 +46,7 @@ image:
         OTEL_EXPORTER_OTLP_HEADERS: "x-honeycomb-team=R6eFvJ6nPc2KYdmp6Md4oH"
         OTEL_BLRP_MAX_EXPORT_BATCH_SIZE: 1
         OTEL_BLRP_SCHEDULE_DELAY: 1
+        OTEL_PHP_TRACES_PROCESSOR: batch
     node:
         version: 18
         npm: 9
